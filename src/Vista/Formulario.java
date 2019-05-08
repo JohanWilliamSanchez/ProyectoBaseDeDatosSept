@@ -241,10 +241,6 @@ public class Formulario extends javax.swing.JFrame {
             }
         });
         jScrollPane4.setViewportView(jTableProveedores);
-        if (jTableProveedores.getColumnModel().getColumnCount() > 0) {
-            jTableProveedores.getColumnModel().getColumn(0).setHeaderValue("Nit");
-            jTableProveedores.getColumnModel().getColumn(3).setHeaderValue("Telefono");
-        }
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);

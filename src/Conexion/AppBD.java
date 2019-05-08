@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class AppBD {    
     public static void main(String []args) {
-        Scanner sc = new Scanner(System.in);
+       /* Scanner sc = new Scanner(System.in);
         System.out.println("\nInsertar un Dato a la Base de Datos, Tabla MaestroProveedores");
         System.out.println("NIT: ");
         int id = sc.nextInt();
@@ -24,7 +24,9 @@ public class AppBD {
         System.out.println("\nAnexar Dato a la Base de Dato");
         bd.ingresarMaestroProveedores(id, nombre, direccion,telefono,ciudad,tipo);
         System.out.println("\nListar informacion");
-        bd.listar();      
+        bd.listar();      */
+        ProcesarBD bd = new ProcesarBD();
+        bd.listar();     
     }   
     }
     
