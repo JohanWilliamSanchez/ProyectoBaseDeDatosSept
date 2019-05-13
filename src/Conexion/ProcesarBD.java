@@ -12,7 +12,6 @@ import javax.swing.JTextField;
 public class ProcesarBD {
 
     private PreparedStatement ps;
-    private ResultSet rs;
 
     private Conexion con;
 
@@ -85,78 +84,54 @@ public class ProcesarBD {
     }
 
     public void  buscarMaestroProveedores(int id,JTextField nit,JTextField nombre, JTextField direccion, JTextField telefono, JTextField ciudad, JTextField tipo) {
-         ResultSet rs = buscar(id, "SELECT * FROM MaestroProveedores WHERE NIT = ?");
-         
+            System.out.println("HolaBusqueda");
         try {
-            if(rs.next()){
-                nit.setText(rs.getString("NIT"));
-                nombre.setText(rs.getString("Nombre"));
-                direccion.setText(rs.getString("Direccion"));
-                telefono.setText(rs.getString("Telefono"));
-                ciudad.setText(rs.getString("Cuidad"));
-                tipo.setText(rs.getString("Tipo"));
-                
+         ResultSet rs1 = buscar( "SELECT * FROM MaestroProveedores WHERE NIT = "+id);          
+            System.out.println("HolaBusqueda2");
+            //System.out.println("rs1.next(): "+rs1.next());
+            System.out.println("Salto");
+            if(rs1.next()){
+                nit.setText(rs1.getString("NIT")); //Son los nombres del atributo de la base de datos
+                nombre.setText(rs1.getString("Nombre"));
+                direccion.setText(rs1.getString("Direccion"));
+                telefono.setText(rs1.getString("Telefono"));
+                ciudad.setText(rs1.getString("Cuidad"));
+                tipo.setText(rs1.getString("Tipo"));                
             } else {
                 JOptionPane.showMessageDialog(null, "No existe una persona con la clave");
             }
         } catch (SQLException ex) {
+            System.out.println("Error en el Buscar pBD");
             System.err.println(ex);
         }
-       
-
     }
     public void  buscarComprobantes(int id) {
-        buscar(id, "SELECT * FROM Comprobantes WHERE Comprobante = ?");
+        buscar( "SELECT * FROM Comprobantes WHERE Comprobante = "+id);
 
     } 
     public void  buscarCentroCosto(int id) {
-        buscar(id, "SELECT * FROM MaestroProveedores WHERE ID = ?");
+        buscar( "SELECT * FROM MaestroProveedores WHERE ID = "+id);
 
     }
     
-     private ResultSet buscar(int NIT,String find) {
+     public ResultSet buscar(String find) {
 
-        boolean estado = false;
-
+        ResultSet rs = null;
         try {
+         
             PreparedStatement ps = con.conectado().prepareStatement(find);
-            ps.setString(1, NIT + "");
 
-            ResultSet rs=ps.executeQuery();
-            ps.execute();
-            ps.close();
-            estado=true;
-
-        } catch (Exception e) {
-            System.out.println("Error en el buscarMaestroProveedores");
-            System.err.println(e);
-        }
-        return rs;
-
-    }
-/*
-    public ResultSet buscarMaestroProveedores(int NIT) {
-
-        boolean estado = false;
-
-        try {
-            PreparedStatement ps;
-            ps = con.conectado().prepareStatement("SELECT * FROM persona WHERE NIT = ?");
-            ps.setString(1, NIT + "");
-
-            rs = ps.executeQuery();
-            /*
-            if(rs.next()){
-                txtId.setText(rs.getString("id"));
-                txtNombre.setText(rs.getString("nombre"));
-                txtDomicilio.setText(rs.getString("domicilio"));
-                txtTelefono.setText(rs.getString("telefono"));
-                txtEmail.setText(rs.getString("correo_electronico"));
-                txtFecha.setText(rs.getString("fecha_nacimiento"));
-                cbxGenero.setSelectedItem(rs.getString("genero"));
-            } else {
-                JOptionPane.showMessageDialog(null, "No existe una persona con la clave");
-            }
+            rs =ps.executeQuery(find);
+            
+            /*while(rs.next()){
+                System.out.println("Se encontro a la persona "+rs.getString(2));
+                
+            }*/
+            
+            
+            
+            /*ps.execute();
+            ps.close();*/
 
         } catch (Exception e) {
             System.out.println("Error en el buscarMaestroProveedores");
@@ -165,7 +140,6 @@ public class ProcesarBD {
         return rs;
 
     }
-*/
     public void eliminarMaestroProveedores(int id) {
         eliminar(id, "DELETE FROM MaestroProveedores WHERE NIT=? ");
     }
@@ -194,5 +168,39 @@ public class ProcesarBD {
 
         return estado;
 
+    }
+    
+    public void busquedaTablaMProvee(int id,JTextField nit,JTextField nombre, JTextField direccion, JTextField telefono, JTextField ciudad, JTextField tipo){
+        ResultSet rs = null;
+        try {
+         
+            String find = "SELECT * FROM MaestroProveedores WHERE NIT = "+id;
+            PreparedStatement ps = con.conectado().prepareStatement(find);
+
+            rs =ps.executeQuery(find);
+            
+            while(rs.next()){
+                System.out.println("Se encontro a la persona "+rs.getString(2));
+                
+            }
+            
+            if(rs.next()){
+                nit.setText(rs.getString("NIT")); //Son los nombres del atributo de la base de datos
+                nombre.setText(rs.getString("Nombre"));
+                direccion.setText(rs.getString("Direccion"));
+                telefono.setText(rs.getString("Telefono"));
+                ciudad.setText(rs.getString("Cuidad"));
+                tipo.setText(rs.getString("Tipo"));                
+            } else {
+                JOptionPane.showMessageDialog(null, "No existe una persona con la clave");
+            }
+            
+            /*ps.execute();
+            ps.close();*/
+
+        } catch (Exception e) {
+            System.out.println("Error en el buscarMaestroProveedores");
+            System.err.println(e);
+        }
     }
 }

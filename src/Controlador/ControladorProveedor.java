@@ -5,6 +5,7 @@
  */
 package Controlador;
 
+import Conexion.Conexion;
 import Conexion.ProcesarBD;
 import Modelo.Proveedor;
 import Vista.Formulario;
@@ -13,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseListener;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -32,6 +34,10 @@ public class ControladorProveedor implements ActionListener, FocusListener, Mous
     private  Proveedor proveedor;
     private DefaultTableModel tablaProv = new DefaultTableModel();
     private int seleccion;
+    private Conexion con;
+    //private ResultSet rs;
+   // private  PreparedStatement ps; 
+    private ProcesarBD pBD=new ProcesarBD();
 
     public ControladorProveedor(Formulario vista) {
         this.vista = vista;
@@ -59,6 +65,14 @@ public class ControladorProveedor implements ActionListener, FocusListener, Mous
         
        
        llenarTabla();
+       
+            /**
+             * Se definen tamaños de la tabla
+             */
+            
+            vista.jTableProveedores.getColumnModel().getColumn(5).setPreferredWidth(20);
+            vista.jTableProveedores.getColumnModel().getColumn(2).setPreferredWidth(110);
+            
     }
 
     
@@ -101,6 +115,8 @@ public class ControladorProveedor implements ActionListener, FocusListener, Mous
                              vista.jTextFieldTipoP.getText().length()!=0 ){
                 
                 proveedor = new Proveedor(nit, telefono, nombre, direccion, ciudad, tipo);
+                pBD.ingresarMaestroProveedores(nit, nombre, direccion, telefono, ciudad, tipo);
+                pBD.listar();
                 String [] datos ={nit+"",  nombre, direccion,telefono+"", ciudad, tipo};
                 tablaProv.addRow(datos);
                 
@@ -142,7 +158,9 @@ public class ControladorProveedor implements ActionListener, FocusListener, Mous
         
         if(e.getSource()==vista.jButtonBuscarP){
             nit=Integer.parseInt(vista.jTextNitP.getText());
+            
             pBD.buscarMaestroProveedores(nit, vista.jTextNitP, vista.jTextFieldNombreP, vista.jTextFieldDireccionP, vista.jTextFieldTelefonoP, vista.jTextFieldCiudadP, vista.jTextFieldTipoP);
+            //pBD.busquedaTablaMProvee(nit, vista.jTextNitP, vista.jTextFieldNombreP, vista.jTextFieldDireccionP, vista.jTextFieldTelefonoP, vista.jTextFieldCiudadP, vista.jTextFieldTipoP);
         }
         
     }
@@ -175,6 +193,8 @@ public class ControladorProveedor implements ActionListener, FocusListener, Mous
                     vista.jTextFieldTipoP.setEditable(true);
                     
                     
+                    vista.jButtonBuscarP.setEnabled(true);
+                    
             }else{
 
                inhabilitar();
@@ -203,6 +223,8 @@ public class ControladorProveedor implements ActionListener, FocusListener, Mous
                       vista.jTextFieldTelefonoP.setEditable(false);
                        vista.jTextFieldDireccionP.setEditable(false);
                         vista.jTextFieldTipoP.setEditable(false);
+                        
+                        vista.jButtonBuscarP.setEnabled(false);
     }
 
     private void llenarTabla(){
@@ -213,33 +235,55 @@ public class ControladorProveedor implements ActionListener, FocusListener, Mous
         tablaProv.addColumn("Telefono");
         tablaProv.addColumn("Ciudad");
         tablaProv.addColumn("Tipo");
-       /* String [] nulos={"","","","","",""};
-        for (int i = 0; i < 12; i++) {
-        tablaProv.addRow(nulos);
-        }*/
+       
+       
+            /**
+             * Inicio: Busca en la base de datos e inserta en la tabla, 
+             */
+            String strConsulta = "SELECT * FROM MaestroProveedores";
             
-         vista.jTableProveedores.setModel(tablaProv);
-         vista.jTableProveedores.setEnabled(false);
+             try {
+            String Tipo = "";System.out.println("hola234 ");
+            pBD.listar();
+            Conexion con1=new  Conexion();
+            PreparedStatement ps = con1.conectado().prepareStatement(strConsulta);
+            ResultSet res = ps.executeQuery();
+
+            int NIT = 0;
+            String Nombre = "";
+            String Direccion = "";
+            int Telefono = 0;
+            String Cuidad = "";
+            while (res.next()) {
+                NIT = res.getInt("NIT");
+                Nombre = res.getString("Nombre");
+                Direccion = res.getString("Direccion");
+                Telefono = res.getInt("Telefono");
+                Cuidad = res.getString("Cuidad");
+                Tipo = res.getString("Tipo");
+
+                String [] datos ={NIT+"",  Nombre, Direccion,Telefono+"", Cuidad, Tipo};
+                tablaProv.addRow(datos);
+            }
+            res.close();
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+            /**
+             * Fin insertar en tabla de la base de datos
+             */
+        
+            
+            
+        vista.jTableProveedores.setModel(tablaProv);
+        vista.jTableProveedores.setEnabled(false);
+        
          
     }
-    /*
-    private void tablaClick(java.awt.event.MouseEvent mE){
-       // int seleccion = tablaProv.
-       
-       seleccion=vista.jTableProveedores.getSelectedRow();
-       
-       if(seleccion!=-1){
-           vista.jTextNitP.setText(vista.jTableProveedores.getValueAt(seleccion, 0).toString());
-           vista.jTextFieldNombreP.setText(vista.jTableProveedores.getValueAt(seleccion, 1).toString());
-           vista.jTextFieldDireccionP.setText(vista.jTableProveedores.getValueAt(seleccion, 2).toString());
-           vista.jTextFieldTelefonoP.setText(vista.jTableProveedores.getValueAt(seleccion, 3).toString());
-           vista.jTextFieldCiudadP.setText(vista.jTableProveedores.getValueAt(seleccion, 4).toString());
-           vista.jTextFieldTipoP.setText(vista.jTableProveedores.getValueAt(seleccion, 5).toString());
-           
-           vista.jButtonActualizarP.setEnabled(true);
-           vista.jButtonEliminarP.setEnabled(true);
-       }
-    }*/
+
 
     @Override
     public void mouseClicked(java.awt.event.MouseEvent e) {
